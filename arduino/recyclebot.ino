@@ -32,7 +32,7 @@ void loop () {
 		uint8_t c = Serial.read ();
 		switch (c) {
 		case '!':
-			target = 0;
+			target = 1024;
 			duty = 0;
 			break;
 		case '=':
