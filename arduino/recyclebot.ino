@@ -16,7 +16,7 @@ void setup () {
 	pinMode (MOTOR, OUTPUT);
 	digitalWrite (HEATER1, LOW);
 	digitalWrite (HEATER2, LOW);
-	analogWrite (MOTOR, duty);
+	digitalWrite (MOTOR, LOW);
 }
 
 void heat (bool heating) {
@@ -67,13 +67,19 @@ void loop () {
 	}
 	int adc = analogRead (SENSOR);
 	heat (adc > target);
-	analogWrite (MOTOR, duty);
 	Serial.print ("adc:");
 	Serial.print (adc);
 	Serial.print (" (");
 	Serial.print (target);
 	Serial.print ("); pwm:");
 	Serial.print (duty);
-	Serial.print ("/255     \r");
-	delay (500);
+	Serial.print ("/100     \r");
+	if (duty > 0) {
+		digitalWrite (MOTOR, HIGH);
+		delay (10 * duty);
+	}
+	if (duty < 100) {
+		digitalWrite (MOTOR, LOW);
+		delay (10 * (100 - duty));
+	}
 }
