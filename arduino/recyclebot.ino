@@ -19,9 +19,15 @@ union Buffer {
 };
 
 static uint8_t sensor_pins[NUM_SENSORS] = {SENSOR_HEATER, SENSOR_TARGET};
-static float Rs[NUM_SENSORS] = {340, 340};
-static float alpha[NUM_SENSORS] = {10.056909432214743, 10.056909432214743};
-static float beta[NUM_SENSORS] = {3885.0342279785623, 3885.0342279785623};
+static float Rs[NUM_SENSORS] = {
+	340,
+       	340};
+static float alpha[NUM_SENSORS] = {
+	10.056909432214743,
+       	10.056909432214743};
+static float beta[NUM_SENSORS] = {
+	3885.0342279785623,
+       	3885.0342279785623};
 static Buffer serial_buffer;
 static uint8_t buffer_pos;
 static Settings settings;
@@ -64,9 +70,11 @@ void loop () {
 	while (Serial.available ())
 		do_serial ();
 	bool heating = true;
+	Buffer state;
+	state.c.duty = settings.duty;
 	for (uint8_t t = 0; t < NUM_SENSORS; ++t) {
-		float temp = readTemp (t);
-		if (temp > settings.T[t])
+		state.c.T[t] = readTemp (t);
+		if (state.c.T[t] > settings.T[t])
 			heating = false;
 	}
 	heat (heating);
@@ -78,4 +86,6 @@ void loop () {
 		digitalWrite (MOTOR, LOW);
 		delay (1000 * int (1 - settings.duty));
 	}
+	for (uint8_t t = 0; t < sizeof (Settings); ++t)
+		Serial.write (state.b[t]);
 }
